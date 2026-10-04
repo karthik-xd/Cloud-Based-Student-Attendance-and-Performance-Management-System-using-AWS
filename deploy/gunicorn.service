@@ -1,0 +1,18 @@
+[Unit]
+Description=Cloud Student Attendance & Performance System C++ Backend Service
+After=network.target
+
+[Service]
+Type=simple
+User=ec2-user
+WorkingDirectory=/opt/cloud_student_system
+ExecStart=/opt/cloud_student_system/build/cloud_student_system
+Restart=always
+RestartSec=5
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=cloud_student_system
+EnvironmentFile=/opt/cloud_student_system/.env
+
+[Install]
+WantedBy=multi-user.target
