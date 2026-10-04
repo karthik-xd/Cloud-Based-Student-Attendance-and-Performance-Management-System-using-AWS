@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# AWS EC2 UserData Bootstrap Script (Universal Fail-Proof Build for AL2023/Ubuntu)
+# AWS EC2 UserData Bootstrap Script (AL2023 / Ubuntu)
 # ==============================================================================
 
 LOG_FILE="/var/log/ec2_user_data.log"
@@ -8,16 +8,16 @@ exec > >(tee -a ${LOG_FILE}) 2>&1
 
 echo "[EC2 USERDATA] Starting AWS EC2 Instance Provisioning at $(date)..."
 
-# 1. Install build dependencies with resilient fallback
+# 1. Install build dependencies
 if command -v dnf &> /dev/null; then
     echo "[EC2 USERDATA] Package manager: DNF (Amazon Linux 2023)"
     dnf update -y || true
     dnf groupinstall -y "Development Tools" || true
-    dnf install -y cmake gcc-c++ git nginx libcurl-devel openssl-devel mariadb-connector-c-devel mariadb-devel mysql-devel || true
+    dnf install -y cmake gcc-c++ git nginx libcurl-devel openssl-devel mariadb-connector-c-devel mariadb-devel mysql-devel mariadb-server || true
 elif command -v apt-get &> /dev/null; then
     echo "[EC2 USERDATA] Package manager: APT (Ubuntu)"
     apt-get update -y || true
-    apt-get install -y build-essential cmake git nginx libcurl4-openssl-dev libssl-dev libmariadb-dev || true
+    apt-get install -y build-essential cmake git nginx libcurl4-openssl-dev libssl-dev libmariadb-dev mariadb-server || true
 fi
 
 # 2. Clone GitHub repository
@@ -44,7 +44,15 @@ S3_BUCKET_NAME=student-system-reports-bucket-demo-hyderabad
 SNS_TOPIC_ARN=arn:aws:sns:ap-south-2:494644230149:low-attendance-alerts
 EOF
 
-# 4. Build C++ CMake executable
+# 4. Initialize Local MariaDB/MySQL Database
+systemctl enable mariadb || systemctl enable mysql || true
+systemctl start mariadb || systemctl start mysql || true
+
+mysql -u root -e "CREATE DATABASE IF NOT EXISTS student_management_db;" || true
+mysql -u root < ${APP_DIR}/database/schema.sql || true
+mysql -u root < ${APP_DIR}/database/seed.sql || true
+
+# 5. Build C++ CMake executable
 echo "[EC2 USERDATA] Compiling C++ Application..."
 mkdir -p build
 cd build
@@ -53,36 +61,19 @@ make -j$(nproc) || make || true
 
 echo "[EC2 USERDATA] Build completed."
 
-# 5. Configure Nginx Reverse Proxy (Port 80 -> Port 8080)
-cat << 'EOF' > /etc/nginx/conf.d/cloud_student_system.conf
-server {
-    listen 80;
-    server_name _;
+# 6. Replace Nginx Configuration to Proxy Port 80 -> Port 8080 C++ App
+cp -f ${APP_DIR}/deploy/nginx.conf /etc/nginx/nginx.conf || true
+rm -f /etc/nginx/conf.d/default.conf || true
+rm -f /etc/nginx/sites-enabled/default || true
 
-    location / {
-        proxy_pass http://127.0.0.1:8080;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-
-    location /static/ {
-        alias /opt/cloud_student_system/static/;
-        expires 30d;
-    }
-}
-EOF
-
-rm -f /etc/nginx/sites-enabled/default
 systemctl restart nginx || true
 systemctl enable nginx || true
 
-# 6. Create Systemd Service for C++ Backend
+# 7. Create Systemd Service for C++ Backend
 cat << 'EOF' > /etc/systemd/system/cloud_student_system.service
 [Unit]
 Description=Cloud Student Attendance & Performance System (C++)
-After=network.target
+After=network.target mariadb.service mysql.service
 
 [Service]
 Type=simple
