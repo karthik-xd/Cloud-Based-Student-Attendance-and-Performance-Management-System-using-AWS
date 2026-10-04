@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# AWS EC2 UserData Bootstrap Script (Amazon Linux 2023 / Ubuntu 22.04)
+# AWS EC2 UserData Bootstrap Script (Asia Pacific Hyderabad - ap-south-2)
 # Clones GitHub Repository, installs C++ build dependencies, compiles the server,
 # configures Nginx reverse proxy, and starts systemd service automatically.
 # ==============================================================================
@@ -10,7 +10,7 @@ set -e
 LOG_FILE="/var/log/ec2_user_data.log"
 exec > >(tee -a ${LOG_FILE}) 2>&1
 
-echo "[EC2 USERDATA] Starting AWS EC2 Instance Provisioning at $(date)..."
+echo "[EC2 USERDATA] Starting AWS EC2 Instance Provisioning in ap-south-2 at $(date)..."
 
 # 1. Update system packages and install build dependencies
 if [ -f /etc/dnf/dnf.conf ] || [ -f /etc/yum.conf ]; then
@@ -34,18 +34,18 @@ git clone ${REPO_URL} ${APP_DIR}
 
 cd ${APP_DIR}
 
-# 3. Create .env configuration file from environment or defaults
+# 3. Create .env configuration file tuned for ap-south-2
 cat << 'EOF' > ${APP_DIR}/.env
 PORT=8080
 SECRET_KEY=production-cloud-secret-key-2026
-DB_HOST=rds-mysql-student-db.c0123456789.eu-north-1.rds.amazonaws.com
+DB_HOST=rds-mysql-student-db.c0123456789.ap-south-2.rds.amazonaws.com
 DB_PORT=3306
 DB_USER=admin
 DB_PASSWORD=StudentManagement2026
 DB_NAME=student_management_db
-AWS_REGION=eu-north-1
-S3_BUCKET_NAME=student-system-reports-bucket-demo
-SNS_TOPIC_ARN=arn:aws:sns:eu-north-1:494644230149:low-attendance-alerts
+AWS_REGION=ap-south-2
+S3_BUCKET_NAME=student-system-reports-bucket-demo-hyderabad
+SNS_TOPIC_ARN=arn:aws:sns:ap-south-2:494644230149:low-attendance-alerts
 EOF
 
 # 4. Build C++ CMake executable
@@ -108,4 +108,4 @@ systemctl daemon-reload
 systemctl enable cloud_student_system
 systemctl start cloud_student_system
 
-echo "[EC2 USERDATA SUCCESS] EC2 Instance Provisioning Complete! Server listening on port 80."
+echo "[EC2 USERDATA SUCCESS] EC2 Instance Provisioning Complete in ap-south-2! Server listening on port 80."
