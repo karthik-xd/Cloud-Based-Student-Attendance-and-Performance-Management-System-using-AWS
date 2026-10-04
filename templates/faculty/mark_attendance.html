@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Mark Attendance - Faculty Console{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h3 class="fw-bold"><i class="fa-solid fa-clipboard-user text-success me-2"></i>Daily Attendance Register</h3>
+        <p class="text-muted">Record daily student attendance for your assigned subjects</p>
+    </div>
+</div>
+
+<div class="card p-4 mb-4">
+    <form action="/faculty/attendance" method="GET" class="row g-3">
+        <div class="col-md-5">
+            <label class="form-label font-weight-bold">Select Subject</label>
+            <select name="subject_id" class="form-select" onchange="this.form.submit()">
+                {% for sub in assigned_subjects %}
+                <option value="{{ sub.id }}" {% if selected_subject_id == sub.id %}selected{% endif %}>{{ sub.subject_code }} - {{ sub.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label font-weight-bold">Attendance Date</label>
+            <input type="date" name="date" class="form-control" value="{{ selected_date }}" required>
+        </div>
+    </form>
+</div>
+
+{% if enrolled_students %}
+<div class="card">
+    <div class="card-header bg-dark text-white fw-bold d-flex justify-content-between align-items-center">
+        <span>Student Roll List</span>
+        <button type="button" class="btn btn-sm btn-outline-light" onclick="toggleAll(true)">Mark All Present</button>
+    </div>
+    <div class="card-body p-0">
+        <form action="/faculty/attendance/save" method="POST">
+            <input type="hidden" name="subject_id" value="{{ selected_subject_id }}">
+            <input type="hidden" name="date" value="{{ selected_date }}">
+
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Roll Number</th>
+                        <th>Student Name</th>
+                        <th>Department</th>
+                        <th class="text-center">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in enrolled_students %}
+                    <tr>
+                        <td><span class="badge bg-primary">{{ student.roll_number }}</span></td>
+                        <td>{{ student.name }}</td>
+                        <td>{{ student.department }}</td>
+                        <td class="text-center">
+                            <div class="btn-group" role="group">
+                                <input type="radio" class="btn-check" name="status_{{ student.id }}" id="present_{{ student.id }}" value="present" checked>
+                                <label class="btn btn-outline-success btn-sm" for="present_{{ student.id }}">Present</label>
+
+                                <input type="radio" class="btn-check" name="status_{{ student.id }}" id="absent_{{ student.id }}" value="absent">
+                                <label class="btn btn-outline-danger btn-sm" for="absent_{{ student.id }}">Absent</label>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="p-3 bg-light text-end border-top">
+                <button type="submit" class="btn btn-success fw-bold px-4"><i class="fa-solid fa-save me-1"></i>Save Attendance Sheet</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+<script>
+function toggleAll(present) {
+    const inputs = document.querySelectorAll('input[type="radio"]');
+    inputs.forEach(input => {
+        if (present && input.value === 'present') input.checked = true;
+    });
+}
+</script>
+{% endblock %}

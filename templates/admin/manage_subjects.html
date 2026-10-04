@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}Manage Subjects - Admin Console{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold"><i class="fa-solid fa-book text-success me-2"></i>Subject & Faculty Mapping</h3>
+    <div>
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addSubjectModal"><i class="fa-solid fa-plus me-1"></i>Add Subject</button>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#assignFacultyModal"><i class="fa-solid fa-link me-1"></i>Assign Subject to Faculty</button>
+    </div>
+</div>
+
+<!-- Subjects Table -->
+<div class="card mb-4">
+    <div class="card-header bg-dark text-white fw-bold"><i class="fa-solid fa-list me-2"></i>Academic Subjects</div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Subject Code</th>
+                    <th>Subject Name</th>
+                    <th>Department</th>
+                    <th>Semester</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sub in subject_list %}
+                <tr>
+                    <td><span class="badge bg-primary">{{ sub.subject_code }}</span></td>
+                    <td>{{ sub.name }}</td>
+                    <td>{{ sub.department }}</td>
+                    <td>Semester {{ sub.semester }}</td>
+                    <td>
+                        <form action="/admin/subjects/delete" method="POST" style="display:inline;" onsubmit="return confirm('Delete subject?')">
+                            <input type="hidden" name="subject_id" value="{{ sub.id }}">
+                            <button class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Faculty Subject Mapping Table -->
+<div class="card">
+    <div class="card-header bg-dark text-white fw-bold"><i class="fa-solid fa-chalkboard-user me-2"></i>Active Faculty Assignments</div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Faculty Name</th>
+                    <th>Subject Code</th>
+                    <th>Subject Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in assignment_list %}
+                <tr>
+                    <td class="fw-bold">{{ a.faculty_name }}</td>
+                    <td><span class="badge bg-info text-dark">{{ a.subject_code }}</span></td>
+                    <td>{{ a.subject_name }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add Subject Modal -->
+<div class="modal fade" id="addSubjectModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="/admin/subjects/add" method="POST">
+                <div class="modal-header bg-success text-white"><h5 class="modal-title">Create New Academic Subject</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <div class="mb-3"><label class="form-label">Subject Code</label><input type="text" name="code" class="form-control" placeholder="CS305" required></div>
+                    <div class="mb-3"><label class="form-label">Subject Name</label><input type="text" name="name" class="form-control" placeholder="Software Engineering" required></div>
+                    <div class="mb-3"><label class="form-label">Department</label><input type="text" name="department" class="form-control" value="Computer Science" required></div>
+                    <div class="mb-3"><label class="form-label">Semester</label><input type="number" name="semester" class="form-control" value="6" min="1" max="8" required></div>
+                </div>
+                <div class="modal-footer"><button type="submit" class="btn btn-success">Save Subject</button></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Assign Subject to Faculty Modal -->
+<div class="modal fade" id="assignFacultyModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="/admin/subjects/assign" method="POST">
+                <div class="modal-header bg-primary text-white"><h5 class="modal-title">Assign Subject to Faculty</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Faculty Member</label>
+                        <select name="faculty_id" class="form-select" required>
+                            {% for f in faculty_list %}
+                            <option value="{{ f.id }}">{{ f.name }} ({{ f.faculty_code }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Subject</label>
+                        <select name="subject_id" class="form-select" required>
+                            {% for sub in subject_list %}
+                            <option value="{{ sub.id }}">{{ sub.subject_code }} - {{ sub.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="submit" class="btn btn-primary">Assign Mapping</button></div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

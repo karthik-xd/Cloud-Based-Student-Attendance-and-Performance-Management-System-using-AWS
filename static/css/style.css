@@ -1,0 +1,84 @@
+/* 
+ * Custom Stylesheet for Cloud Student Attendance & Performance Management System
+ * Built on top of Bootstrap 5
+ */
+
+:root {
+    --primary-color: #0d6efd;
+    --secondary-color: #6c757d;
+    --success-color: #198754;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --dark-bg: #1e293b;
+    --light-bg: #f8fafc;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f1f5f9;
+    color: #334155;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Navbar Styling */
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* Card Enhancements */
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Status Badges */
+.badge-low-attendance {
+    background-color: var(--danger-color);
+    color: #fff;
+    padding: 0.5em 0.8em;
+    font-size: 0.85rem;
+    animation: pulse 2s infinite;
+}
+
+.badge-good-attendance {
+    background-color: var(--success-color);
+    color: #fff;
+    padding: 0.5em 0.8em;
+    font-size: 0.85rem;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+}
+
+/* Table Styling */
+.table-custom {
+    background-color: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table-custom th {
+    background-color: #0f172a;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* Footer Styling */
+footer {
+    margin-top: auto;
+    background-color: #0f172a;
+    color: #94a3b8;
+}

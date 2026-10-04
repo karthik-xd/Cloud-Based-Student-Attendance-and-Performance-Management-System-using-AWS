@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard - Cloud Student System{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="fw-bold"><i class="fa-solid fa-user-shield me-2 text-primary"></i>Administrator Control Center</h2>
+        <p class="text-muted">System Overview & Cloud Infrastructure Stats</p>
+    </div>
+</div>
+
+<!-- KPI Cards Row -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-white-50">Total Faculty</h6>
+                    <h2 class="fw-bold mb-0">{{ faculty_count }}</h2>
+                </div>
+                <i class="fa-solid fa-chalkboard-user display-6 opacity-50"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-white-50">Enrolled Students</h6>
+                    <h2 class="fw-bold mb-0">{{ student_count }}</h2>
+                </div>
+                <i class="fa-solid fa-graduation-cap display-6 opacity-50"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-white-50">Active Subjects</h6>
+                    <h2 class="fw-bold mb-0">{{ subject_count }}</h2>
+                </div>
+                <i class="fa-solid fa-book-open display-6 opacity-50"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-dark text-white p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-white-50">AWS Region</h6>
+                    <h5 class="fw-bold mb-0">eu-north-1</h5>
+                </div>
+                <i class="fa-brands fa-aws display-6 text-warning opacity-75"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Action Buttons -->
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <div class="card p-3 h-100">
+            <h5 class="fw-bold"><i class="fa-solid fa-users me-2 text-primary"></i>Manage User Accounts</h5>
+            <p class="text-muted small">Add, view, or remove Faculty and Student accounts from MySQL Amazon RDS.</p>
+            <a href="/admin/users" class="btn btn-outline-primary mt-auto">Go to User Management</a>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card p-3 h-100">
+            <h5 class="fw-bold"><i class="fa-solid fa-layer-group me-2 text-success"></i>Manage Subjects & Mapping</h5>
+            <p class="text-muted small">Create course subjects and assign faculty members to specific subjects.</p>
+            <a href="/admin/subjects" class="btn btn-outline-success mt-auto">Go to Subject Mapping</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

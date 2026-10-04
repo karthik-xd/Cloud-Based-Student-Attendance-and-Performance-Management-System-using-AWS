@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}403 Forbidden Access{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center my-5 text-center">
+    <div class="col-md-6">
+        <h1 class="display-1 fw-bold text-danger"><i class="fa-solid fa-lock me-3"></i>403</h1>
+        <h3 class="fw-bold">Access Denied / Forbidden</h3>
+        <p class="text-muted">You do not have permission to access this resource or page role.</p>
+        <a href="/" class="btn btn-primary mt-3"><i class="fa-solid fa-house me-1"></i>Return to Homepage</a>
+    </div>
+</div>
+{% endblock %}

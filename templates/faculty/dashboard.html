@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Faculty Dashboard - Cloud Student System{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="fw-bold"><i class="fa-solid fa-chalkboard-user me-2 text-primary"></i>Faculty Workspace</h2>
+            <p class="text-muted">Welcome, {{ session.name if session.name else 'Faculty Member' }}</p>
+        </div>
+        <div>
+            <a href="/reports/upload" class="btn btn-outline-primary"><i class="fa-solid fa-file-arrow-up me-1"></i>Upload S3 Notes</a>
+        </div>
+    </div>
+</div>
+
+<!-- Assigned Courses Cards -->
+<div class="row g-4 mb-4">
+    {% for sub in assigned_subjects %}
+    <div class="col-md-6">
+        <div class="card p-4 h-100 border-start border-4 border-primary">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <span class="badge bg-primary fs-6">{{ sub.subject_code }}</span>
+                <span class="badge bg-secondary">Semester {{ sub.semester }}</span>
+            </div>
+            <h4 class="fw-bold mb-1">{{ sub.name }}</h4>
+            <p class="text-muted small mb-3">Department of {{ sub.department }}</p>
+            <div class="d-flex gap-2 mt-auto">
+                <a href="/faculty/attendance?subject_id={{ sub.id }}" class="btn btn-success btn-sm w-50"><i class="fa-solid fa-clipboard-check me-1"></i>Mark Attendance</a>
+                <a href="/faculty/marks?subject_id={{ sub.id }}" class="btn btn-primary btn-sm w-50"><i class="fa-solid fa-pen-to-square me-1"></i>Enter Marks</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

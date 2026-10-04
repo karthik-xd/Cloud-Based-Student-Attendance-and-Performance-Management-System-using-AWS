@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Enter Marks - Faculty Console{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h3 class="fw-bold"><i class="fa-solid fa-pen-to-square text-primary me-2"></i>Academic Marks Entry</h3>
+        <p class="text-muted">Enter internal assessment, assignment, and final exam marks</p>
+    </div>
+</div>
+
+<div class="card p-4 mb-4">
+    <form action="/faculty/marks" method="GET" class="row g-3">
+        <div class="col-md-6">
+            <label class="form-label font-weight-bold">Select Subject</label>
+            <select name="subject_id" class="form-select" onchange="this.form.submit()">
+                {% for sub in assigned_subjects %}
+                <option value="{{ sub.id }}" {% if selected_subject_id == sub.id %}selected{% endif %}>{{ sub.subject_code }} - {{ sub.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>
+</div>
+
+{% if student_marks %}
+<div class="card">
+    <div class="card-header bg-dark text-white fw-bold">Student Evaluation Register</div>
+    <div class="card-body p-0">
+        <form action="/faculty/marks/save" method="POST">
+            <input type="hidden" name="subject_id" value="{{ selected_subject_id }}">
+
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Roll Number</th>
+                        <th>Student Name</th>
+                        <th style="width: 140px;">Internal 1 (20)</th>
+                        <th style="width: 140px;">Internal 2 (20)</th>
+                        <th style="width: 140px;">Assignment (10)</th>
+                        <th style="width: 140px;">Final Exam (50)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in student_marks %}
+                    <tr>
+                        <td><span class="badge bg-primary">{{ s.roll_number }}</span></td>
+                        <td>{{ s.name }}</td>
+                        <td><input type="number" step="0.5" name="i1_{{ s.student_id }}" class="form-control form-control-sm" value="{{ s.internal1_marks }}" min="0" max="20"></td>
+                        <td><input type="number" step="0.5" name="i2_{{ s.student_id }}" class="form-control form-control-sm" value="{{ s.internal2_marks }}" min="0" max="20"></td>
+                        <td><input type="number" step="0.5" name="ass_{{ s.student_id }}" class="form-control form-control-sm" value="{{ s.assignment_marks }}" min="0" max="10"></td>
+                        <td><input type="number" step="0.5" name="final_{{ s.student_id }}" class="form-control form-control-sm" value="{{ s.final_marks }}" min="0" max="50"></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="p-3 bg-light text-end border-top">
+                <button type="submit" class="btn btn-primary fw-bold px-4"><i class="fa-solid fa-save me-1"></i>Save Grades & Marks</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

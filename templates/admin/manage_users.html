@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}Manage Users - Admin Console{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold"><i class="fa-solid fa-users text-primary me-2"></i>User Management</h3>
+    <div>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addFacultyModal"><i class="fa-solid fa-plus me-1"></i>Add Faculty</button>
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addStudentModal"><i class="fa-solid fa-plus me-1"></i>Add Student</button>
+    </div>
+</div>
+
+<!-- Faculty Table -->
+<div class="card mb-4">
+    <div class="card-header bg-dark text-white fw-bold"><i class="fa-solid fa-chalkboard-user me-2"></i>Faculty Profiles</div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Department</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for f in faculty_list %}
+                <tr>
+                    <td><span class="badge bg-secondary">{{ f.faculty_code }}</span></td>
+                    <td>{{ f.name }}</td>
+                    <td>{{ f.email }}</td>
+                    <td>{{ f.department }}</td>
+                    <td>
+                        <form action="/admin/users/delete" method="POST" style="display:inline;" onsubmit="return confirm('Delete user?')">
+                            <input type="hidden" name="user_id" value="{{ f.user_id }}">
+                            <button class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Student Table -->
+<div class="card">
+    <div class="card-header bg-dark text-white fw-bold"><i class="fa-solid fa-graduation-cap me-2"></i>Student Profiles</div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Roll Number</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Department</th>
+                    <th>Semester</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in student_list %}
+                <tr>
+                    <td><span class="badge bg-info text-dark">{{ s.roll_number }}</span></td>
+                    <td>{{ s.name }}</td>
+                    <td>{{ s.email }}</td>
+                    <td>{{ s.department }}</td>
+                    <td>Sem {{ s.semester }}</td>
+                    <td>
+                        <form action="/admin/users/delete" method="POST" style="display:inline;" onsubmit="return confirm('Delete student?')">
+                            <input type="hidden" name="user_id" value="{{ s.user_id }}">
+                            <button class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add Faculty Modal -->
+<div class="modal fade" id="addFacultyModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="/admin/faculty/add" method="POST">
+                <div class="modal-header bg-primary text-white"><h5 class="modal-title">Add New Faculty Member</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <div class="mb-3"><label class="form-label">Full Name</label><input type="text" name="name" class="form-control" required></div>
+                    <div class="mb-3"><label class="form-label">Faculty Code</label><input type="text" name="code" class="form-control" placeholder="FAC104" required></div>
+                    <div class="mb-3"><label class="form-label">Email</label><input type="email" name="email" class="form-control" required></div>
+                    <div class="mb-3"><label class="form-label">Department</label><input type="text" name="department" class="form-control" value="Computer Science" required></div>
+                </div>
+                <div class="modal-footer"><button type="submit" class="btn btn-primary">Create Faculty Profile</button></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Student Modal -->
+<div class="modal fade" id="addStudentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="/admin/student/add" method="POST">
+                <div class="modal-header bg-success text-white"><h5 class="modal-title">Add New Student Profile</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <div class="mb-3"><label class="form-label">Full Name</label><input type="text" name="name" class="form-control" required></div>
+                    <div class="mb-3"><label class="form-label">Roll Number</label><input type="text" name="roll_number" class="form-control" placeholder="CS202416" required></div>
+                    <div class="mb-3"><label class="form-label">Email</label><input type="email" name="email" class="form-control" required></div>
+                    <div class="mb-3"><label class="form-label">Department</label><input type="text" name="department" class="form-control" value="Computer Science" required></div>
+                    <div class="mb-3"><label class="form-label">Semester</label><input type="number" name="semester" class="form-control" value="6" min="1" max="8" required></div>
+                </div>
+                <div class="modal-footer"><button type="submit" class="btn btn-success">Create Student Profile</button></div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

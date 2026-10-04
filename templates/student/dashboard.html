@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Student Dashboard - Cloud Student System{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="fw-bold"><i class="fa-solid fa-graduation-cap text-primary me-2"></i>Student Performance Center</h2>
+            <p class="text-muted">Welcome, {{ student_info.name }} (Roll Number: {{ student_info.roll_number }})</p>
+        </div>
+        <div>
+            <a href="/reports/export" class="btn btn-outline-success"><i class="fa-solid fa-file-csv me-1"></i>Download S3 Attendance Report</a>
+        </div>
+    </div>
+</div>
+
+<!-- Warning Alert Badge if Attendance < 75% -->
+{% if student_info.is_low_attendance %}
+<div class="alert alert-danger shadow-sm border-2 mb-4 d-flex align-items-center">
+    <i class="fa-solid fa-triangle-exclamation display-6 me-3 text-danger"></i>
+    <div>
+        <h5 class="fw-bold mb-1">CRITICAL ATTENDANCE WARNING (< 75%)</h5>
+        <p class="mb-0">Your overall attendance is <strong>{{ "%.2f"|format(student_info.overall_percentage) }}%</strong>, which is below the mandatory 75% university requirement. An automated alert notification has been logged via AWS SNS.</p>
+    </div>
+</div>
+{% endif %}
+
+<!-- Top Stats Card & Charts Row -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card p-4 h-100 text-center">
+            <h6 class="text-muted text-uppercase fw-bold">Overall Attendance Rate</h6>
+            <div class="display-3 fw-bold my-3 {% if student_info.is_low_attendance %}text-danger{% else %}text-success{% endif %}">
+                {{ "%.1f"|format(student_info.overall_percentage) }}%
+            </div>
+            <div class="progress mb-3" style="height: 12px;">
+                <div class="progress-bar {% if student_info.is_low_attendance %}bg-danger{% else %}bg-success{% endif %}" 
+                     role="progressbar" style="width: {{ student_info.overall_percentage }}%;"></div>
+            </div>
+            <p class="small text-muted mb-0">{{ student_info.total_classes_present }} / {{ student_info.total_classes_held }} Total Sessions Attended</p>
+        </div>
+    </div>
+
+    <!-- Attendance Doughnut Chart -->
+    <div class="col-md-4">
+        <div class="card p-3 h-100">
+            <h6 class="fw-bold text-center mb-2">Attendance Ratio</h6>
+            <div style="height: 180px;">
+                <canvas id="attendanceDoughnutChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Marks Bar Chart -->
+    <div class="col-md-4">
+        <div class="card p-3 h-100">
+            <h6 class="fw-bold text-center mb-2">Academic Marks Breakdown</h6>
+            <div style="height: 180px;">
+                <canvas id="marksBarChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Subject Wise Attendance Breakdown Table -->
+<div class="card mb-4">
+    <div class="card-header bg-dark text-white fw-bold"><i class="fa-solid fa-list-check me-2"></i>Subject-Wise Attendance Metrics</div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Subject Code</th>
+                    <th>Subject Name</th>
+                    <th>Classes Held</th>
+                    <th>Attended</th>
+                    <th>Percentage</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sub in student_info.subject_breakdown %}
+                <tr>
+                    <td><span class="badge bg-primary">{{ sub.subject_code }}</span></td>
+                    <td>{{ sub.subject_name }}</td>
+                    <td>{{ sub.classes_held }}</td>
+                    <td>{{ sub.classes_present }}</td>
+                    <td><strong>{{ "%.2f"|format(sub.percentage) }}%</strong></td>
+                    <td>
+                        {% if sub.is_low_attendance %}
+                        <span class="badge badge-low-attendance"><i class="fa-solid fa-triangle-exclamation me-1"></i>Low (<75%)</span>
+                        {% else %}
+                        <span class="badge badge-good-attendance"><i class="fa-solid fa-check me-1"></i>Good</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderAttendanceChart(
+        'attendanceDoughnutChart', 
+        {{ student_info.total_classes_present }}, 
+        {{ student_info.total_classes_held - student_info.total_classes_present }}
+    );
+
+    renderMarksChart(
+        'marksBarChart',
+        [{% for sub in student_info.subject_breakdown %}'{{ sub.subject_code }}',{% endfor %}],
+        [18.5, 17.0, 16.0],
+        [19.0, 18.0, 15.5],
+        [9.5, 9.0, 8.5],
+        [45.0, 42.5, 39.0]
+    );
+});
+</script>
+{% endblock %}
